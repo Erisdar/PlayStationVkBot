@@ -25,7 +25,7 @@ bot.on((ctx) => {
       doc.useServiceAccountAuth(creds, (err) => {
         doc.getRows(1, (err, rows) => { 
           try {
-            const nick = info.response[1].domain;
+            const nick = info.response[0].domain;
 
             const row = rows
             .map(({ login, game, password, t31, t32, t2 }) => (
