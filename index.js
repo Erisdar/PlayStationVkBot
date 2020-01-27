@@ -40,6 +40,7 @@ bot.on((ctx) => {
             }
           } catch (error) {
             ctx.reply('Извините, сервер временно не работает');
+            console.log(error);
           }     
          
         });
