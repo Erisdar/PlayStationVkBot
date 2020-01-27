@@ -11,6 +11,8 @@ const bot = new VkBot({
   confirmation: 'a4a77312'
 });
 
+const PORT = process.env.PORT || 80;
+
 var doc = new GoogleSpreadsheet('1Buc1DUzCZKGN39R4pHH1JGQB3ZJaxPtb2m-ivpusHT0');
 
 bot.on((ctx) => {
@@ -52,4 +54,6 @@ app.use(bodyParser.json())
 
 app.post('/', bot.webhookCallback)
 
-app.listen(8080)
+app.listen(PORT, () => {
+  console.log(`Ps bot app listening on port ${PORT}!`);
+});
