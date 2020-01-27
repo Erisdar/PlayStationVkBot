@@ -7,34 +7,45 @@ const api = require('node-vk-bot-api/lib/api');
 
 const app = express();
 const bot = new VkBot({
-  token: '5e76bc1692b69aae0f347bb98481890e1357b47d1c57ea3d26d8f7e1e01af0d73c84d8c338244af7b3ba7',
-  confirmation: 'ca7bac18'
+  token: '03f3d3fc6f27c4919d855701eed0584dfa973e0b55bb7edf6c790428bd451d746ad06549c2e1009f51aea',
+  confirmation: 'a4a77312'
 });
 
-var doc = new GoogleSpreadsheet('1YU-mxkinvXoRJw-BQ1MqVPk8BC-zPatjP6MnvkQ1olo');
+var doc = new GoogleSpreadsheet('1Buc1DUzCZKGN39R4pHH1JGQB3ZJaxPtb2m-ivpusHT0');
 
 bot.on((ctx) => {
-  api('users.get', {
-    user_ids: ctx.message.from_id,
-    fields: ['domain'],
-    access_token: '5e76bc1692b69aae0f347bb98481890e1357b47d1c57ea3d26d8f7e1e01af0d73c84d8c338244af7b3ba7',
-  }).then(info => {
-    const nick = info.response[0].domain;
+  try {
+    api('users.get', {
+      user_ids: ctx.message.from_id,
+      fields: ['domain'],
+      access_token: '03f3d3fc6f27c4919d855701eed0584dfa973e0b55bb7edf6c790428bd451d746ad06549c2e1009f51aea',
+    }).then(info => { 
+      doc.useServiceAccountAuth(creds, (err) => {
+        doc.getRows(1, (err, rows) => { 
+          try {
+            const nick = info.response[1].domain;
 
-    doc.useServiceAccountAuth(creds, function (err) {
-      doc.getRows(1, function (err, rows) {
-        const row = rows
-          .map(({ email, password, message, login }) => { return { email, password, message, login }; })
-          .filter(({ login }) => login === nick);
-
-        if (row.length) {
-          ctx.reply(JSON.stringify(row));
-        } else {
-          ctx.reply('У вас нет аккаунта');
-        }
+            const row = rows
+            .map(({ login, game, password, t31, t32, t2 }) => (
+              { login, game, password, t31, t32, t2 }
+            ))
+              .filter(({ t31, t32, t2, game }) => [t31, t32, t2].includes(nick) && ctx.message.text === game);
+    
+            if (row.length) {
+              ctx.reply(`Ваш пароль от игры ${row[0].game}: ${row[0].password}`);
+            } else {
+              ctx.reply('У вас нет игры');
+            }
+          } catch (error) {
+            ctx.reply('Извините, сервер временно не работает');
+          }     
+         
+        });
       });
-    });
-  })
+    })
+  } catch (error) {   
+    ctx.reply('Извините, сервер временно не работает');
+  }
 })
 
 app.use(bodyParser.json())
