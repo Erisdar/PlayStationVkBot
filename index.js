@@ -52,7 +52,7 @@ const loadCache = () => auth(google_creds)
       )));
 
 loadCache();
-setTimeout(loadCache, 30_000);
+setInterval(loadCache, 30_000);
 
 const getPasswordWithInstruction = ({ mail, game, passwordlogin, account }) => {
   const passwordText = `Ваш пароль: ${game} (${account}) \u2013 ${mail} \u2013 ${passwordlogin}`;
@@ -89,7 +89,7 @@ bot.command(GET_PASSSWORD, (ctx) => {
 
 bot.on((ctx) => {
   const info = cache.get(ctx.message.from_id);  
-  (!!info ? Promise.resolve(info) : getInfo(ctx.message.from_id))
+  (info ? Promise.resolve(info) : getInfo(ctx.message.from_id))
     .then(info => {
       const nick = info.response[0].domain;
       cache.set(ctx.message.from_id, info);
