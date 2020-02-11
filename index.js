@@ -15,8 +15,8 @@ dotenv.config();
 const { VK_TOKEN, VK_CONFIRMATION, GOOGLE_SHEET, PORT = 80, GOOGLE_CLIENT_EMAIL, GOOGLE_PRIVATE_KEY } = process.env;
 
 const google_creds = {
-    private_key: GOOGLE_PRIVATE_KEY,
-    client_email: GOOGLE_CLIENT_EMAIL,
+  private_key: GOOGLE_PRIVATE_KEY,
+  client_email: GOOGLE_CLIENT_EMAIL,
 };
 
 const VK_URL_REGEX = /[^/]*$/;
@@ -74,7 +74,7 @@ bot.command('Начать', ctx => {
     ],
     [
       Markup.button(GET_PASSSWORD, 'positive'),
-      Markup.button(GET_ALL_PASSWORDS, 'negative'),
+      // Markup.button(GET_ALL_PASSWORDS, 'negative'),
     ],
   ]));
 });
@@ -88,24 +88,25 @@ bot.command(GET_PASSSWORD, (ctx) => {
 });
 
 bot.on((ctx) => {
-  const info = cache.get(ctx.message.from_id);  
+  const info = cache.get(ctx.message.from_id);
   (info ? Promise.resolve(info) : getInfo(ctx.message.from_id))
     .then(info => {
       const nick = info.response[0].domain;
       cache.set(ctx.message.from_id, info);
-  
+
       const row = sheets
-        .map(({ t31, t32, t2, mail, game, passwordlogin })=> {
+        .map(({ t31, t32, t2, mail, game, passwordlogin }) => {
           let account = null;
           if ([t31, t32].some((vkUrl) => VK_URL_REGEX.exec(vkUrl)[0] === nick)) {
             account = ACCOUNT_TYPE.T3;
-          } 
+          }
           if (VK_URL_REGEX.exec(t2)[0] === nick) {
             account = ACCOUNT_TYPE.T2;
           };
-          return {mail, game, passwordlogin, account};
+          return { mail, game, passwordlogin, account };
         })
-        .filter(({ account, mail}) => account && (ctx.message.text === mail || ctx.message.text === GET_ALL_PASSWORDS));
+        .filter(({ account, mail }) => account && (ctx.message.text === mail));
+      // .filter(({ account, mail}) => account && (ctx.message.text === mail || ctx.message.text === GET_ALL_PASSWORDS));
 
       if (!row.length) {
         ctx.reply('У вас нет игры');
@@ -113,8 +114,8 @@ bot.on((ctx) => {
 
       if (row.length === 1) {
         ctx.reply(getPasswordWithInstruction(row[0]));
-      } 
-      
+      }
+
       if (row.length > 1) {
         ctx.reply(getAllPasswords(row));
       }
