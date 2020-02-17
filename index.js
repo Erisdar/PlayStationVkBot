@@ -7,7 +7,7 @@ const util = require('util')
 const Cache = require('node-cache')
 const dotenv = require('dotenv');
 const GoogleSpreadsheet = require('google-spreadsheet')
-const { INSTRUCTION, GET_PASSSWORD, GET_ALL_PASSWORDS } = require('./constant/ui.constant');
+const { INSTRUCTION, GET_PASSSWORD } = require('./constant/ui.constant');
 const ACCOUNT_TYPE = require('./constant/account.constant');
 
 dotenv.config();
@@ -67,31 +67,33 @@ const getAllPasswords = (games) => {
   return `Ваши пароли:\n ${games.map(({ mail, game, passwordlogin, account }) => `${game} (${account}) \u2013 ${mail} \u2013 ${passwordlogin}`).join('\n')}`;
 };
 
-bot.command('Начать', ctx => {
-  ctx.reply('Hello!', null, Markup.keyboard([
-    [
-      Markup.button(INSTRUCTION, 'primary'),
-    ],
-    [
-      Markup.button(GET_PASSSWORD, 'positive'),
-      // Markup.button(GET_ALL_PASSWORDS, 'negative'),
-    ],
-  ]));
+const KEYBOARD = Markup.keyboard([
+  [
+    Markup.button(INSTRUCTION, 'primary'),
+  ],
+  [
+    Markup.button(GET_PASSSWORD, 'positive'),
+    // Markup.button(GET_ALL_PASSWORDS, 'negative'),
+  ],
+]);
+
+bot.command('Начать', (ctx) => {
+  ctx.reply('Привет!', null, KEYBOARD);
 });
 
 bot.command(INSTRUCTION, (ctx) => {
-  ctx.reply(`В группе существуют правила, по использованию аккаунтов, не будем соблюдать, лишитесь игр, и вечный бан, если глобально смотреть. \nhttps://vk.com/topic-166006208_38549925`);
+  ctx.reply(`В группе существуют правила, по использованию аккаунтов, не будем соблюдать, лишитесь игр, и вечный бан, если глобально смотреть. \nhttps://vk.com/topic-166006208_38549925`, null, KEYBOARD);
 });
 
 bot.command(GET_PASSSWORD, (ctx) => {
-  ctx.reply(`Для получения пароля от игры, введите логин`);
+  ctx.reply(`Для получения пароля от игры, введите логин`, null, KEYBOARD);
 });
 
 bot.on((ctx) => {
   const info = cache.get(ctx.message.from_id);
   (info ? Promise.resolve(info) : getInfo(ctx.message.from_id))
     .then(info => {
-      const nick = info.response[0].domain;
+      const nick = info.response[0].domain;      
       cache.set(ctx.message.from_id, info);
 
       const row = sheets
@@ -113,11 +115,11 @@ bot.on((ctx) => {
       }
 
       if (row.length === 1) {
-        ctx.reply(getPasswordWithInstruction(row[0]));
+        ctx.reply(getPasswordWithInstruction(row[0]), null, KEYBOARD);
       }
 
       if (row.length > 1) {
-        ctx.reply(getAllPasswords(row));
+        ctx.reply(getAllPasswords(row), null, KEYBOARD);
       }
     })
     .catch((error) => {
