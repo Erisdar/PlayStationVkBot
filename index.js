@@ -86,7 +86,7 @@ bot.command(INSTRUCTION, (ctx) => {
 });
 
 bot.command(GET_PASSSWORD, (ctx) => {
-  ctx.reply(`Для получения пароля от игры, введите логин`, null, KEYBOARD);
+  ctx.reply(`Для получения пароля от игры, введите логин (почту)`, null, KEYBOARD);
 });
 
 bot.on((ctx) => {
