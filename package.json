@@ -15,5 +15,8 @@
     "google-spreadsheet": "^3.1.15",
     "node-cache": "^5.1.0",
     "node-vk-bot-api": "^3.3.3"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
